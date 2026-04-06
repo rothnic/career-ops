@@ -31,4 +31,5 @@ node_modules/
 # Claude Code local
 .claude/settings.local.json
 .claude/memory/
+.opencode/logs/
 career-dashboard

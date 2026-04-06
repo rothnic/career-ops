@@ -1,0 +1,30 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "*": "ask",
+    "read": "allow",
+    "write": "allow",
+    "edit": "allow",
+    "bash": {
+      "*": "ask",
+      "node cv-sync-check.mjs": "allow",
+      "node generate-pdf.mjs": "allow",
+      "node merge-tracker.mjs": "allow",
+      "node verify-pipeline.mjs": "allow",
+      "npm run verify": "allow",
+      "npm run sync-check": "allow",
+      "bash batch/batch-runner.sh *": "allow"
+    }
+  },
+  "mcp": {
+    "playwright": {
+      "type": "local",
+      "enabled": false,
+      "command": [
+        "npx",
+        "-y",
+        "@playwright/mcp@latest"
+      ]
+    }
+  }
+}

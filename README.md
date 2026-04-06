@@ -2,9 +2,10 @@
 
 **[:gb: English](#what-is-this)** | **[:es: Español](#es-versión-en-español)**
 
-> AI-powered job search pipeline built on Claude Code. Evaluate offers, generate tailored CVs, scan portals, and track everything -- powered by AI agents.
+> AI-powered job search pipeline with an OpenCode-first orchestration harness. Evaluate offers, generate tailored CVs, scan portals, and track everything -- powered by AI agents.
 
-![Claude Code](https://img.shields.io/badge/Claude_Code-000?style=flat&logo=anthropic&logoColor=white)
+![OpenCode](https://img.shields.io/badge/OpenCode-111?style=flat)
+![Claude Compatible](https://img.shields.io/badge/Claude-Compatible-000?style=flat&logo=anthropic&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
 ![Go](https://img.shields.io/badge/Go-00ADD8?style=flat&logo=go&logoColor=white)
 ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=flat&logo=playwright&logoColor=white)
@@ -18,7 +19,7 @@
 
 ## What Is This
 
-Career-Ops turns Claude Code into a full job search command center. Instead of manually tracking applications in a spreadsheet, you get an AI-powered pipeline that:
+Career-Ops turns an AI coding agent harness into a full job search command center. OpenCode is the default path, and Claude Code remains available if you want the old workflow. Instead of manually tracking applications in a spreadsheet, you get an AI-powered pipeline that:
 
 - **Evaluates offers** with a structured A-F scoring system (10 weighted dimensions)
 - **Generates tailored PDFs** -- ATS-optimized CVs customized per job description
@@ -40,7 +41,7 @@ Built by someone who used it to evaluate 740+ job offers, generate 100+ tailored
 | **Negotiation Scripts** | Salary negotiation frameworks, geographic discount pushback, competing offer leverage |
 | **ATS PDF Generation** | Keyword-injected CVs with Space Grotesk + DM Sans design |
 | **Portal Scanner** | 45+ companies pre-configured (Anthropic, OpenAI, ElevenLabs, Retool, n8n...) + custom queries across Ashby, Greenhouse, Lever, Wellfound |
-| **Batch Processing** | Parallel evaluation with `claude -p` workers |
+| **Batch Processing** | Parallel evaluation with OpenCode workers or Claude-compatible fallback |
 | **Dashboard TUI** | Terminal UI to browse, filter, and sort your pipeline |
 | **Pipeline Integrity** | Automated merge, dedup, status normalization, health checks |
 
@@ -59,10 +60,10 @@ cp templates/portals.example.yml portals.yml       # Customize companies
 # 3. Add your CV
 # Create cv.md in the project root with your CV in markdown
 
-# 4. Personalize with Claude
-claude   # Open Claude Code in this directory
+# 4. Personalize with OpenCode
+opencode   # Open OpenCode in this directory
 
-# Then ask Claude to adapt the system to you:
+# Then ask the agent to adapt the system to you:
 # "Change the archetypes to backend engineering roles"
 # "Translate the modes to English"
 # "Add these 5 companies to portals.yml"
@@ -72,9 +73,10 @@ claude   # Open Claude Code in this directory
 # Paste a job URL or run /career-ops
 ```
 
-> **The system is designed to be customized by Claude itself.** Modes, archetypes, scoring weights, negotiation scripts -- just ask Claude to change them. It reads the same files it uses, so it knows exactly what to edit.
+> **The system is designed to be customized by the harness itself.** Modes, archetypes, scoring weights, negotiation scripts -- just ask the agent to change them. OpenCode is the primary harness, and Claude remains optional.
 
 See [docs/SETUP.md](docs/SETUP.md) for the full setup guide.
+See [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md) for the shared contract and [docs/OPENCODE-MIGRATION.md](docs/OPENCODE-MIGRATION.md) for the OpenCode mapping.
 
 ## Usage
 
@@ -150,9 +152,11 @@ Features: 6 filter tabs, 4 sort modes, grouped/flat view, lazy-loaded previews, 
 
 ```
 career-ops/
-├── CLAUDE.md                    # Agent instructions
+├── CLAUDE.md                    # Claude compatibility adapter
+├── opencode.json                # OpenCode config + permissions
 ├── cv.md                        # Your CV (create this)
 ├── article-digest.md            # Your proof points (optional)
+├── .opencode/                   # OpenCode agents, commands, plugins
 ├── config/
 │   └── profile.example.yml      # Template for your profile
 ├── modes/                       # 14 skill modes
@@ -169,6 +173,8 @@ career-ops/
 ├── batch/
 │   ├── batch-prompt.md          # Self-contained worker prompt
 │   └── batch-runner.sh          # Orchestrator script
+├── orchestration/
+│   └── run-agent.mjs            # Provider-neutral worker adapter
 ├── dashboard/                   # Go TUI pipeline viewer
 ├── data/                        # Your tracking data (gitignored)
 ├── reports/                     # Evaluation reports (gitignored)
@@ -180,13 +186,14 @@ career-ops/
 
 ## Tech Stack
 
-![Claude Code](https://img.shields.io/badge/Claude_Code-000?style=flat&logo=anthropic&logoColor=white)
+![OpenCode](https://img.shields.io/badge/OpenCode-111?style=flat)
+![Claude Compatible](https://img.shields.io/badge/Claude-Compatible-000?style=flat&logo=anthropic&logoColor=white)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=node.js&logoColor=white)
 ![Playwright](https://img.shields.io/badge/Playwright-2EAD33?style=flat&logo=playwright&logoColor=white)
 ![Go](https://img.shields.io/badge/Go-00ADD8?style=flat&logo=go&logoColor=white)
 ![Bubble Tea](https://img.shields.io/badge/Bubble_Tea-FF75B5?style=flat&logo=go&logoColor=white)
 
-- **Agent**: Claude Code with custom skills and modes
+- **Agent Harness**: OpenCode commands/agents/plugins, with Claude compatibility
 - **PDF**: Playwright/Puppeteer + HTML template
 - **Scanner**: Playwright + Greenhouse API + WebSearch
 - **Dashboard**: Go + Bubble Tea + Lipgloss (Catppuccin Mocha theme)
@@ -212,7 +219,7 @@ MIT
 
 ## Que es esto
 
-Career-Ops convierte Claude Code en un centro de mando de busqueda de empleo. En vez de trackear aplicaciones en un spreadsheet, tienes un pipeline AI que:
+Career-Ops convierte un harness de agentes AI en un centro de mando de busqueda de empleo. OpenCode es la ruta principal y Claude Code queda como compatibilidad opcional. En vez de trackear aplicaciones en un spreadsheet, tienes un pipeline AI que:
 
 - **Evalua ofertas** con scoring estructurado A-F (10 dimensiones ponderadas)
 - **Genera PDFs personalizados** -- CVs ATS-optimizados por oferta
@@ -238,8 +245,8 @@ cp templates/portals.example.yml portals.yml       # Personalizar empresas
 # 3. Añadir tu CV
 # Crear cv.md en la raiz del proyecto con tu CV en markdown
 
-# 4. Personalizar con Claude
-claude   # Abrir Claude Code en este directorio
+# 4. Personalizar con OpenCode
+opencode   # Abrir OpenCode en este directorio
 
 # Pidele a Claude que adapte el sistema a ti:
 # "Cambia los arquetipos a roles de backend"
@@ -251,7 +258,7 @@ claude   # Abrir Claude Code en este directorio
 # Pega una URL de oferta o ejecuta /career-ops
 ```
 
-> **El sistema esta diseñado para que Claude lo personalice.** Modes, arquetipos, scoring, scripts de negociacion -- solo pidelo. Claude lee los mismos archivos que usa, asi que sabe exactamente que editar.
+> **El sistema esta diseñado para que el agente lo personalice.** Modes, arquetipos, scoring, scripts de negociacion -- solo pidelo. OpenCode es la ruta principal y Claude sigue disponible si lo prefieres.
 
 Guia completa en [docs/SETUP.md](docs/SETUP.md).
 

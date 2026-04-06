@@ -2,9 +2,10 @@
 
 ## Prerequisites
 
-- [Claude Code](https://claude.ai/code) installed and configured
+- [OpenCode](https://opencode.ai/) installed and configured
 - Node.js 18+ (for PDF generation and utility scripts)
 - (Optional) Go 1.21+ (for the dashboard TUI)
+- (Optional) [Claude Code](https://claude.ai/code) if you want compatibility with the previous harness
 
 ## Quick Start (5 steps)
 
@@ -44,13 +45,15 @@ Edit `portals.yml`:
 
 ### 5. Start using
 
-Open Claude Code in this directory:
+Open OpenCode in this directory:
 
 ```bash
-claude
+opencode
 ```
 
 Then paste a job offer URL or description. Career-ops will automatically evaluate it, generate a report, create a tailored PDF, and track it.
+
+If you prefer the previous harness, Claude Code still works as an optional compatibility path.
 
 ## Available Commands
 

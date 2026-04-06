@@ -112,6 +112,17 @@ The repo currently ships first-class adapters for Claude Code and OpenCode.
 | Shell execution | Bash | native OpenCode shell tool |
 | Headless workers | `claude -p` | `opencode run`, shared server clients, or SDK wrapper via `orchestration/run-agent.mjs` |
 
+### OpenCode CLI contract
+
+When `orchestration/run-agent.mjs` launches `opencode run`, it combines prompts as:
+
+1. resolved system prompt
+2. separator `---`
+3. `User request:`
+4. invocation prompt
+
+`CAREER_OPS_OPENCODE_RUN_ARGS` is intended for simple quoted CLI flags such as provider, model, or shared-server client flags. Use the SDK path if you need more complex argument escaping or orchestration.
+
 ## Plugin and hook contract
 
 OpenCode plugins should cover the repo-level behavior previously documented as Claude hooks:
@@ -136,10 +147,10 @@ At minimum, the harness must preserve these repo safety constraints:
 
 Environment selectors:
 
-- `CAREER_OPS_AGENT_PROVIDER=auto|opencode|claude`
+- `CAREER_OPS_AGENT_PROVIDER=auto|opencode|claude` selects the **coding-agent harness adapter**
 - `CAREER_OPS_OPENCODE_MODE=cli|sdk`
 - `CAREER_OPS_OPENCODE_BIN` to override the `opencode` executable
-- `CAREER_OPS_OPENCODE_RUN_ARGS` to pass any provider/client/server/model flags supported by the local OpenCode install
+- `CAREER_OPS_OPENCODE_RUN_ARGS` to pass any OpenCode-supported **LLM provider / model / client / server flags**
 - `CAREER_OPS_OPENCODE_SDK_CMD` to point at an SDK-backed worker command
 - `CAREER_OPS_CLAUDE_BIN` to override the `claude` executable
 
@@ -162,4 +173,4 @@ When adding new orchestration behavior:
 1. Put shared behavior here first
 2. Keep provider adapters thin
 3. Avoid embedding provider-specific assumptions in `modes/*.md`
-4. Do not hardcode a single OpenCode provider; allow any provider supported by the user's OpenCode runtime
+4. Do not hardcode a single OpenCode LLM provider or model; allow any provider/model/client flags supported by the user's OpenCode runtime

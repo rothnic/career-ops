@@ -3,6 +3,8 @@
 import { readFile } from "node:fs/promises";
 import { spawn, spawnSync } from "node:child_process";
 
+const EXIT_CODE_SIGNAL_TERMINATED = 128;
+
 function getArg(name) {
   const index = process.argv.indexOf(name);
   if (index === -1) return undefined;
@@ -28,6 +30,8 @@ function requiredArg(name) {
 }
 
 function shellWords(input = "") {
+  // Supports simple shell-style quoted arguments for CAREER_OPS_OPENCODE_RUN_ARGS.
+  // For complex escaping, prefer an SDK worker via CAREER_OPS_OPENCODE_SDK_CMD.
   const matches = input.match(/"[^"]*"|'[^']*'|\S+/g) || [];
   return matches.map((part) => part.replace(/^['"]|['"]$/g, ""));
 }
@@ -83,7 +87,7 @@ function spawnAndPipe(command, args, options = {}) {
       }
 
       if (signal) {
-        resolve(128);
+        resolve(EXIT_CODE_SIGNAL_TERMINATED);
         return;
       }
 

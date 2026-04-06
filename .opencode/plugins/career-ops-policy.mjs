@@ -11,6 +11,10 @@ function argsText(input, output) {
   }).toLowerCase();
 }
 
+function containsDotEnvPath(text) {
+  return /(^|[\\/"'\s])\.env(\.[a-z0-9_-]+)?(?=$|[\\/"'\s])/i.test(text);
+}
+
 function isPlaywrightInvocation(input, output) {
   const text = argsText(input, output);
   return (
@@ -33,6 +37,38 @@ async function currentPlaywrightLockHolder() {
   }
 }
 
+function processExists(pid) {
+  if (!pid || !/^\d+$/.test(pid)) {
+    return false;
+  }
+
+  try {
+    process.kill(Number(pid), 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function acquirePlaywrightLockSafely() {
+  try {
+    await acquirePlaywrightLock();
+  } catch (error) {
+    if (error?.code !== "EEXIST") {
+      throw error;
+    }
+
+    const holder = await currentPlaywrightLockHolder();
+    if (!processExists(holder)) {
+      await releasePlaywrightLock();
+      await acquirePlaywrightLock();
+      return;
+    }
+
+    throw error;
+  }
+}
+
 async function releasePlaywrightLock() {
   await fs.rm(PLAYWRIGHT_LOCK, { force: true });
 }
@@ -41,13 +77,13 @@ export const CareerOpsPolicy = async () => ({
   "tool.execute.before": async (input, output) => {
     const text = argsText(input, output);
 
-    if (text.includes(".env")) {
+    if (containsDotEnvPath(text)) {
       throw new Error("Career-Ops policy blocks access to .env files.");
     }
 
     if (isPlaywrightInvocation(input, output)) {
       try {
-        await acquirePlaywrightLock();
+        await acquirePlaywrightLockSafely();
       } catch {
         const holder = await currentPlaywrightLockHolder();
         throw new Error(

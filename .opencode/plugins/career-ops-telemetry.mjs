@@ -13,11 +13,15 @@ async function append(entry) {
 
 export const CareerOpsTelemetry = async () => ({
   "tool.execute.after": async (input, output) => {
-    await append({
-      ts: new Date().toISOString(),
-      tool: input?.tool ?? "unknown",
-      args: input?.args ?? {},
-      result: output?.result ?? null,
-    });
+    try {
+      await append({
+        ts: new Date().toISOString(),
+        tool: input?.tool ?? "unknown",
+        args: input?.args ?? {},
+        result: output?.result ?? null,
+      });
+    } catch {
+      // Telemetry must never block tool execution.
+    }
   },
 });

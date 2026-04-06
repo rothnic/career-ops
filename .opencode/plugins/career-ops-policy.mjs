@@ -43,6 +43,7 @@ function processExists(pid) {
   }
 
   try {
+    // Uses the Unix-style signal 0 existence check available in Node.
     process.kill(Number(pid), 0);
     return true;
   } catch {

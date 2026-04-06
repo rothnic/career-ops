@@ -31,10 +31,56 @@ function requiredArg(name) {
 }
 
 function shellWords(input = "") {
-  // Supports simple shell-style quoted arguments for CAREER_OPS_OPENCODE_RUN_ARGS.
-  // For complex escaping, prefer an SDK worker via CAREER_OPS_OPENCODE_SDK_CMD.
-  const matches = input.match(/"[^"]*"|'[^']*'|\S+/g) || [];
-  return matches.map((part) => part.replace(/^['"]|['"]$/g, ""));
+  const args = [];
+  let current = "";
+  let quote = null;
+  let escaping = false;
+
+  for (const char of input) {
+    if (escaping) {
+      current += char;
+      escaping = false;
+      continue;
+    }
+
+    if (char === "\\") {
+      escaping = true;
+      continue;
+    }
+
+    if (quote) {
+      if (char === quote) {
+        quote = null;
+      } else {
+        current += char;
+      }
+      continue;
+    }
+
+    if (char === '"' || char === "'") {
+      quote = char;
+      continue;
+    }
+
+    if (/\s/.test(char)) {
+      if (current) {
+        args.push(current);
+        current = "";
+      }
+      continue;
+    }
+
+    current += char;
+  }
+
+  if (escaping) {
+    current += "\\";
+  }
+  if (current) {
+    args.push(current);
+  }
+
+  return args;
 }
 
 function commandExists(command) {

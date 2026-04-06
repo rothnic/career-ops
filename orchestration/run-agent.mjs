@@ -76,7 +76,19 @@ function spawnAndPipe(command, args, options = {}) {
 
     child.stdout.on("data", (chunk) => process.stdout.write(chunk));
     child.stderr.on("data", (chunk) => process.stderr.write(chunk));
-    child.on("close", (code) => resolve(code ?? 1));
+    child.on("close", (code, signal) => {
+      if (code !== null) {
+        resolve(code);
+        return;
+      }
+
+      if (signal) {
+        resolve(128);
+        return;
+      }
+
+      resolve(1);
+    });
   });
 }
 

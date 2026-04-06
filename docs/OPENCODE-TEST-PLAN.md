@@ -4,8 +4,8 @@ Use this checklist to validate OpenCode support across the full Career-Ops syste
 
 ## 1. Config and project discovery
 
-1. Confirm `/home/runner/work/career-ops/career-ops/.opencode/opencode.jsonc` is present
-2. Start OpenCode in `/home/runner/work/career-ops/career-ops`
+1. Confirm `.opencode/opencode.jsonc` is present
+2. Start OpenCode in the repository root
 3. Verify project agents, commands, skills, and plugins are discovered
 
 ## 2. Router parity
@@ -30,7 +30,7 @@ Use this checklist to validate OpenCode support across the full Career-Ops syste
 
 ## 5. Batch via CLI
 
-1. Run `bash /home/runner/work/career-ops/career-ops/batch/batch-runner.sh --dry-run`
+1. Run `bash batch/batch-runner.sh --dry-run`
 2. Run a single-worker batch with `CAREER_OPS_AGENT_PROVIDER=opencode`
 3. Confirm logs, reports, PDFs, and tracker additions still land in the expected paths
 
@@ -38,7 +38,7 @@ Use this checklist to validate OpenCode support across the full Career-Ops syste
 
 1. Start your shared OpenCode server using the server mode supported by your installation
 2. Set `CAREER_OPS_OPENCODE_RUN_ARGS` to the matching client flags
-3. Run `bash /home/runner/work/career-ops/career-ops/batch/batch-runner.sh --parallel 4`
+3. Run `bash batch/batch-runner.sh --parallel 4`
 4. Confirm multiple clients connect successfully and outputs remain contract-compatible
 
 ## 7. Batch via SDK
@@ -51,7 +51,7 @@ Use this checklist to validate OpenCode support across the full Career-Ops syste
 
 1. Run `npm run verify`
 2. Run `npm run sync-check`
-3. Run `cd /home/runner/work/career-ops/career-ops/dashboard && go build -o /tmp/career-dashboard .`
+3. Run `cd dashboard && go build -o /tmp/career-dashboard .`
 4. Re-run `merge-tracker.mjs`, `normalize-statuses.mjs`, and `dedup-tracker.mjs` if batch outputs changed
 
 ## 9. Claude parity spot-check

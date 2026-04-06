@@ -67,8 +67,7 @@ The adapter sends one JSON payload per invocation on stdin:
 ```json
 {
   "prompt": "user prompt text",
-  "systemPrompt": "resolved system prompt",
-  "systemPromptFile": "/absolute/path/to/file.md"
+  "systemPrompt": "resolved system prompt"
 }
 ```
 

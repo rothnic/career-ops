@@ -117,7 +117,6 @@ async function main() {
       exitCode = await runOpenCodeSdk({
         prompt,
         systemPrompt,
-        systemPromptFile,
       });
     } else {
       exitCode = await runOpenCodeCli(prompt, systemPrompt);

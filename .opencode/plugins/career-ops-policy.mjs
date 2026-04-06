@@ -25,6 +25,14 @@ async function acquirePlaywrightLock() {
   await fs.writeFile(PLAYWRIGHT_LOCK, `${process.pid}`, { flag: "wx" });
 }
 
+async function currentPlaywrightLockHolder() {
+  try {
+    return (await fs.readFile(PLAYWRIGHT_LOCK, "utf8")).trim();
+  } catch {
+    return "unknown";
+  }
+}
+
 async function releasePlaywrightLock() {
   await fs.rm(PLAYWRIGHT_LOCK, { force: true });
 }
@@ -41,8 +49,9 @@ export const CareerOpsPolicy = async () => ({
       try {
         await acquirePlaywrightLock();
       } catch {
+        const holder = await currentPlaywrightLockHolder();
         throw new Error(
-          "Career-Ops serializes Playwright access. Wait for the current browser task to finish."
+          `Career-Ops serializes Playwright access. Process ${holder} currently holds the browser lock.`
         );
       }
     }

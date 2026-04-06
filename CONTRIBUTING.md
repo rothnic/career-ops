@@ -1,6 +1,6 @@
 # Contributing to Career-Ops
 
-Thanks for your interest in contributing! Career-Ops is built with Claude Code, and you can use it for development too.
+Thanks for your interest in contributing! Career-Ops is provider-agnostic and supports both Claude Code and OpenCode as first-class coding-agent harnesses.
 
 ## Before Submitting a PR
 

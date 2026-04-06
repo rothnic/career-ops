@@ -5,21 +5,21 @@ Dos modos de uso: **conductor --chrome** (navega portales en tiempo real) o **st
 ## Arquitectura
 
 ```
-Claude Conductor (claude --chrome --dangerously-skip-permissions)
+Provider Conductor (Claude Code y OpenCode soportados)
   │
   │  Chrome: navega portales (sesiones logueadas)
   │  Lee DOM directo — el usuario ve todo en tiempo real
   │
   ├─ Oferta 1: lee JD del DOM + URL
-  │    └─► claude -p worker → report .md + PDF + tracker-line
+  │    └─► worker del proveedor → report .md + PDF + tracker-line
   │
   ├─ Oferta 2: click siguiente, lee JD + URL
-  │    └─► claude -p worker → report .md + PDF + tracker-line
+  │    └─► worker del proveedor → report .md + PDF + tracker-line
   │
   └─ Fin: merge tracker-additions → applications.md + resumen
 ```
 
-Cada worker es un `claude -p` hijo con contexto limpio de 200K tokens. El conductor solo orquesta.
+Cada worker es un hijo aislado del proveedor activo. Claude Code y OpenCode son opciones equivalentes. El conductor solo orquesta.
 
 ## Archivos
 
@@ -44,9 +44,10 @@ batch/
    c. Calcular siguiente REPORT_NUM secuencial
    d. Ejecutar via Bash:
       ```bash
-      claude -p --dangerously-skip-permissions \
-        --append-system-prompt-file batch/batch-prompt.md \
-        "Procesa esta oferta. URL: {url}. JD: /tmp/batch-jd-{id}.txt. Report: {num}. ID: {id}"
+      CAREER_OPS_AGENT_PROVIDER=opencode \
+        node orchestration/run-agent.mjs \
+        --system-prompt-file batch/batch-prompt.md \
+        --prompt "Procesa esta oferta. URL: {url}. JD: /tmp/batch-jd-{id}.txt. Report: {num}. ID: {id}"
       ```
    e. Actualizar `batch-state.tsv` (completed/failed + score + report_num)
    f. Log a `logs/{report_num}-{id}.log`
@@ -82,9 +83,9 @@ id	url	status	started_at	completed_at	report_num	score	error	retries
 - Lock file (`batch-runner.pid`) previene ejecución doble
 - Cada worker es independiente: fallo en oferta #47 no afecta a las demás
 
-## Workers (claude -p)
+## Workers (OpenCode / Claude)
 
-Cada worker recibe `batch-prompt.md` como system prompt. Es self-contained.
+Cada worker recibe `batch-prompt.md` como system prompt. Es self-contained. El adapter `orchestration/run-agent.mjs` decide si el backend es Claude o alguna modalidad de OpenCode: CLI local, clientes conectados a un servidor compartido, o SDK.
 
 El worker produce:
 1. Report `.md` en `reports/`

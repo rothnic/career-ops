@@ -49,24 +49,16 @@ The negotiation section provides frameworks for salary discussions. Replace the 
 - Geographic arbitrage strategy
 - Pushback responses
 
-## Hooks (Optional)
+## Plugins and Hooks (Optional)
 
-Career-ops can integrate with external systems via Claude Code hooks. Example hooks:
+Career-ops can integrate with external systems via OpenCode plugins and hook events or Claude Code hooks.
 
-```json
-{
-  "hooks": {
-    "SessionStart": [{
-      "hooks": [{
-        "type": "command",
-        "command": "echo 'Career-ops session started'"
-      }]
-    }]
-  }
-}
-```
+Examples in this repo:
 
-Save hooks in `.claude/settings.json`.
+- `.opencode/plugins/career-ops-policy.mjs` — guardrails and Playwright serialization
+- `.opencode/plugins/career-ops-telemetry.mjs` — tool event logging
+
+Use `.opencode/plugins/` for OpenCode lifecycle behavior and `.claude/settings.json` for Claude-specific hooks when needed. Keep the behavior aligned across harnesses where practical.
 
 ## States (templates/states.yml)
 

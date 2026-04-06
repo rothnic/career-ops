@@ -7,6 +7,8 @@ args: mode
 
 # career-ops -- Router
 
+Read `docs/ORCHESTRATION.md` before routing. This file is the Claude adapter for the shared orchestration contract.
+
 ## Mode Routing
 
 Determine the mode from `{{mode}}`:

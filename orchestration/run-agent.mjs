@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { readFile } from "node:fs/promises";
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 
 function getArg(name) {
   const index = process.argv.indexOf(name);
@@ -25,6 +25,40 @@ function requiredArg(name) {
     throw new Error(`Missing required argument: ${name}`);
   }
   return value;
+}
+
+function shellWords(input = "") {
+  const matches = input.match(/"[^"]*"|'[^']*'|\S+/g) || [];
+  return matches.map((part) => part.replace(/^['"]|['"]$/g, ""));
+}
+
+function commandExists(command) {
+  const result = spawnSync("which", [command], { stdio: "ignore" });
+  return result.status === 0;
+}
+
+function resolveProvider(requestedProvider) {
+  if (requestedProvider && requestedProvider !== "auto") {
+    return requestedProvider;
+  }
+
+  const opencodeAvailable =
+    process.env.CAREER_OPS_OPENCODE_MODE === "sdk" ||
+    Boolean(process.env.CAREER_OPS_OPENCODE_SDK_CMD) ||
+    commandExists(process.env.CAREER_OPS_OPENCODE_BIN || "opencode");
+  const claudeAvailable = commandExists(process.env.CAREER_OPS_CLAUDE_BIN || "claude");
+
+  if (opencodeAvailable && claudeAvailable) {
+    throw new Error(
+      "Both OpenCode and Claude Code are available. Set CAREER_OPS_AGENT_PROVIDER=opencode or claude."
+    );
+  }
+  if (opencodeAvailable) return "opencode";
+  if (claudeAvailable) return "claude";
+
+  throw new Error(
+    "No supported coding agent was detected. Install OpenCode or Claude Code, or set the relevant environment variables."
+  );
 }
 
 function spawnAndPipe(command, args, options = {}) {
@@ -60,11 +94,12 @@ async function runClaude(prompt, systemPromptFile) {
 
 async function runOpenCodeCli(prompt, systemPrompt) {
   const bin = process.env.CAREER_OPS_OPENCODE_BIN || "opencode";
+  const runArgs = shellWords(process.env.CAREER_OPS_OPENCODE_RUN_ARGS);
   const combinedPrompt = systemPrompt
     ? `${systemPrompt}\n\n---\n\nUser request:\n${prompt}`
     : prompt;
 
-  return spawnAndPipe(bin, ["run", combinedPrompt]);
+  return spawnAndPipe(bin, ["run", ...runArgs, combinedPrompt]);
 }
 
 async function runOpenCodeSdk(payload) {
@@ -88,12 +123,13 @@ async function main() {
   if (hasArg("--help")) {
     process.stdout.write(
       [
-        "Usage: node orchestration/run-agent.mjs --prompt <text> [--system-prompt-file <path>] [--provider opencode|claude]",
+        "Usage: node orchestration/run-agent.mjs --prompt <text> [--system-prompt-file <path>] [--provider auto|opencode|claude]",
         "",
         "Environment:",
-        "  CAREER_OPS_AGENT_PROVIDER       Default provider (opencode by default)",
+        "  CAREER_OPS_AGENT_PROVIDER       Default provider (auto by default)",
         "  CAREER_OPS_OPENCODE_MODE        opencode backend: cli or sdk",
         "  CAREER_OPS_OPENCODE_BIN         Override opencode executable",
+        "  CAREER_OPS_OPENCODE_RUN_ARGS    Extra OpenCode client/provider/server flags",
         "  CAREER_OPS_OPENCODE_SDK_CMD     External SDK worker command",
         "  CAREER_OPS_CLAUDE_BIN           Override claude executable",
         "",
@@ -102,7 +138,9 @@ async function main() {
     process.exit(0);
   }
 
-  const provider = getArg("--provider") || process.env.CAREER_OPS_AGENT_PROVIDER || "opencode";
+  const provider = resolveProvider(
+    getArg("--provider") || process.env.CAREER_OPS_AGENT_PROVIDER || "auto"
+  );
   const prompt = requiredArg("--prompt");
   const systemPromptFile = getArg("--system-prompt-file");
   const systemPrompt = await readSystemPrompt();

@@ -5,7 +5,7 @@ Dos modos de uso: **conductor --chrome** (navega portales en tiempo real) o **st
 ## Arquitectura
 
 ```
-Provider Conductor (OpenCode primario, Claude opcional)
+Provider Conductor (Claude Code y OpenCode soportados)
   │
   │  Chrome: navega portales (sesiones logueadas)
   │  Lee DOM directo — el usuario ve todo en tiempo real
@@ -19,7 +19,7 @@ Provider Conductor (OpenCode primario, Claude opcional)
   └─ Fin: merge tracker-additions → applications.md + resumen
 ```
 
-Cada worker es un hijo aislado del proveedor activo. OpenCode es el default; Claude queda como fallback de compatibilidad. El conductor solo orquesta.
+Cada worker es un hijo aislado del proveedor activo. Claude Code y OpenCode son opciones equivalentes. El conductor solo orquesta.
 
 ## Archivos
 
@@ -85,7 +85,7 @@ id	url	status	started_at	completed_at	report_num	score	error	retries
 
 ## Workers (OpenCode / Claude)
 
-Cada worker recibe `batch-prompt.md` como system prompt. Es self-contained. El adapter `orchestration/run-agent.mjs` decide si el backend es OpenCode CLI, OpenCode SDK o Claude.
+Cada worker recibe `batch-prompt.md` como system prompt. Es self-contained. El adapter `orchestration/run-agent.mjs` decide si el backend es Claude o alguna modalidad de OpenCode: CLI local, clientes conectados a un servidor compartido, o SDK.
 
 El worker produce:
 1. Report `.md` en `reports/`

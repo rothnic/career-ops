@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # career-ops batch runner — standalone orchestrator for provider-backed workers
-# Reads batch-input.tsv, delegates each offer to an OpenCode or Claude worker,
+# Reads batch-input.tsv, delegates each offer to a Claude Code or OpenCode worker,
 # tracks state in batch-state.tsv for resumability.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -23,11 +23,12 @@ DRY_RUN=false
 RETRY_FAILED=false
 START_FROM=0
 MAX_RETRIES=2
+RESOLVED_PROVIDER=""
 
 usage() {
   cat <<'USAGE'
-career-ops batch runner — process job offers in batch via OpenCode or Claude workers
-Defaults to OpenCode. Claude remains available as a compatibility provider.
+career-ops batch runner — process job offers in batch via Claude Code or OpenCode workers
+Both harnesses are supported. In auto mode, the runner selects the only installed one.
 
 Usage: batch-runner.sh [OPTIONS]
 
@@ -47,9 +48,10 @@ Files:
   tracker-additions/   Tracker lines for post-batch merge
 
 Environment:
-  CAREER_OPS_AGENT_PROVIDER   opencode (default) or claude
+  CAREER_OPS_AGENT_PROVIDER   auto (default), opencode, or claude
   CAREER_OPS_OPENCODE_MODE    cli (default) or sdk
   CAREER_OPS_OPENCODE_BIN     Override opencode executable
+  CAREER_OPS_OPENCODE_RUN_ARGS Extra OpenCode client/provider/server flags
   CAREER_OPS_OPENCODE_SDK_CMD External SDK worker command
   CAREER_OPS_CLAUDE_BIN       Override claude executable
 
@@ -66,6 +68,43 @@ Examples:
   # Process 2 at a time starting from ID 10
   ./batch-runner.sh --parallel 2 --start-from 10
 USAGE
+}
+
+command_exists() {
+  command -v "$1" &>/dev/null
+}
+
+resolve_provider() {
+  local requested="${CAREER_OPS_AGENT_PROVIDER:-auto}"
+  if [[ "$requested" != "auto" ]]; then
+    echo "$requested"
+    return
+  fi
+
+  local opencode_available=false
+  local claude_available=false
+
+  if [[ "${CAREER_OPS_OPENCODE_MODE:-cli}" == "sdk" || -n "${CAREER_OPS_OPENCODE_SDK_CMD:-}" ]]; then
+    opencode_available=true
+  elif command_exists "${CAREER_OPS_OPENCODE_BIN:-opencode}"; then
+    opencode_available=true
+  fi
+
+  if command_exists "${CAREER_OPS_CLAUDE_BIN:-claude}"; then
+    claude_available=true
+  fi
+
+  if [[ "$opencode_available" == "true" && "$claude_available" == "true" ]]; then
+    echo "ERROR: Both OpenCode and Claude Code are available. Set CAREER_OPS_AGENT_PROVIDER=opencode or claude." >&2
+    exit 1
+  elif [[ "$opencode_available" == "true" ]]; then
+    echo "opencode"
+  elif [[ "$claude_available" == "true" ]]; then
+    echo "claude"
+  else
+    echo "ERROR: No supported coding agent was detected. Install OpenCode or Claude Code, or set the relevant environment variables." >&2
+    exit 1
+  fi
 }
 
 # Parse arguments
@@ -116,7 +155,9 @@ check_prerequisites() {
     exit 1
   fi
 
-  local provider="${CAREER_OPS_AGENT_PROVIDER:-opencode}"
+  local provider
+  provider="$(resolve_provider)"
+  RESOLVED_PROVIDER="$provider"
   local opencode_mode="${CAREER_OPS_OPENCODE_MODE:-cli}"
 
   if [[ "$provider" == "claude" ]]; then
@@ -283,7 +324,7 @@ process_offer() {
   # Launch provider-backed worker through the orchestration adapter
   local exit_code=0
   node "$PROJECT_DIR/orchestration/run-agent.mjs" \
-    --provider "${CAREER_OPS_AGENT_PROVIDER:-opencode}" \
+    --provider "$RESOLVED_PROVIDER" \
     --system-prompt-file "$resolved_prompt" \
     --prompt "$prompt" \
     > "$log_file" 2>&1 || exit_code=$?
@@ -382,7 +423,7 @@ main() {
   fi
 
   echo "=== career-ops batch runner ==="
-  echo "Provider: ${CAREER_OPS_AGENT_PROVIDER:-opencode} | OpenCode mode: ${CAREER_OPS_OPENCODE_MODE:-cli}"
+  echo "Provider: $RESOLVED_PROVIDER | OpenCode mode: ${CAREER_OPS_OPENCODE_MODE:-cli}"
   echo "Parallel: $PARALLEL | Max retries: $MAX_RETRIES"
   echo "Input: $total_input offers"
   echo ""

@@ -1,10 +1,10 @@
 # Orchestration Contract
 
-Career-Ops is now **provider-agnostic**:
+Career-Ops supports **multiple coding-agent harnesses**:
 
-- **OpenCode is the primary harness**
-- **Claude Code is an optional compatibility harness**
+- **Claude Code and OpenCode are first-class supported adapters**
 - `modes/*.md` remain the workflow source of truth
+- shared orchestration behavior lives here instead of in any one harness
 
 ## Canonical instruction tree
 
@@ -20,9 +20,29 @@ Provider-specific files are adapters only:
 
 - `CLAUDE.md`
 - `.claude/skills/career-ops/SKILL.md`
+- `.opencode/opencode.jsonc`
 - `.opencode/agents/*`
 - `.opencode/commands/*`
+- `.opencode/skills/*`
 - `.opencode/plugins/*`
+
+## Commands, skills, and agents
+
+Career-Ops separates entrypoints from execution:
+
+- **commands / skills** route user input to the correct mode
+- **agents** execute the mode with the required context
+
+Harness policy:
+
+1. If the harness supports project skills and the `career-ops` skill exists, load the skill router first
+2. Otherwise use the command router
+3. The selected router then dispatches to the correct mode and agent
+
+OpenCode may expose both:
+
+- `.opencode/commands/career-ops.md`
+- `.opencode/skills/career-ops/SKILL.md` (Claude-compatible skill format)
 
 ## Routing contract
 
@@ -78,19 +98,19 @@ For `scan`, `apply`, and `pipeline` with 3+ URLs, the harness should prefer a sp
 
 ## Tool compatibility matrix
 
-All current Claude Code behavior must be reproducible through OpenCode tools, plugins, MCP servers, or CLI/SDK orchestration.
+The repo currently ships first-class adapters for Claude Code and OpenCode.
 
-| Capability | Claude Code today | OpenCode path |
+| Capability | Claude Code path | OpenCode path |
 |---|---|---|
-| Router command | `.claude/skills/career-ops/SKILL.md` | `.opencode/commands/career-ops.md` |
-| Session instructions | `CLAUDE.md` | `.opencode/agents/*.md` + `docs/ORCHESTRATION.md` |
+| Command / skill router | `.claude/skills/career-ops/SKILL.md` | `.opencode/commands/career-ops.md` or `.opencode/skills/career-ops/SKILL.md` |
+| Session instructions | `CLAUDE.md` + `docs/ORCHESTRATION.md` | `.opencode/agents/*.md` + `docs/ORCHESTRATION.md` |
 | Specialist agents | Claude subagents | OpenCode agents/subagents |
-| Hooks | `.claude/settings.json` hooks | `.opencode/plugins/*.mjs` |
+| Hooks / lifecycle | `.claude/settings.json` hooks | `.opencode/plugins/*.mjs` |
 | Browser automation | browser tools | OpenCode browser tooling and/or Playwright MCP |
 | Web fetch/search | WebFetch/WebSearch | OpenCode web tools and/or MCP servers |
 | File editing | Read/Write/Edit | native OpenCode file tools |
 | Shell execution | Bash | native OpenCode shell tool |
-| Headless workers | `claude -p` | `opencode run` or SDK wrapper via `orchestration/run-agent.mjs` |
+| Headless workers | `claude -p` | `opencode run`, shared server clients, or SDK wrapper via `orchestration/run-agent.mjs` |
 
 ## Plugin and hook contract
 
@@ -116,11 +136,18 @@ At minimum, the harness must preserve these repo safety constraints:
 
 Environment selectors:
 
-- `CAREER_OPS_AGENT_PROVIDER=opencode|claude`
+- `CAREER_OPS_AGENT_PROVIDER=auto|opencode|claude`
 - `CAREER_OPS_OPENCODE_MODE=cli|sdk`
 - `CAREER_OPS_OPENCODE_BIN` to override the `opencode` executable
+- `CAREER_OPS_OPENCODE_RUN_ARGS` to pass any provider/client/server/model flags supported by the local OpenCode install
 - `CAREER_OPS_OPENCODE_SDK_CMD` to point at an SDK-backed worker command
 - `CAREER_OPS_CLAUDE_BIN` to override the `claude` executable
+
+OpenCode execution modes:
+
+- standalone CLI invocation
+- multiple CLI clients connected to a shared OpenCode server
+- SDK-backed worker execution
 
 Expected invariants:
 
@@ -135,3 +162,4 @@ When adding new orchestration behavior:
 1. Put shared behavior here first
 2. Keep provider adapters thin
 3. Avoid embedding provider-specific assumptions in `modes/*.md`
+4. Do not hardcode a single OpenCode provider; allow any provider supported by the user's OpenCode runtime

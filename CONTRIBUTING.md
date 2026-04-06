@@ -1,6 +1,6 @@
 # Contributing to Career-Ops
 
-Thanks for your interest in contributing! Career-Ops is provider-agnostic, uses OpenCode as the primary harness, and still supports Claude Code as a compatibility path.
+Thanks for your interest in contributing! Career-Ops is provider-agnostic and supports both Claude Code and OpenCode as first-class coding-agent harnesses.
 
 ## Quick Start
 

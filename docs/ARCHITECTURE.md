@@ -4,8 +4,8 @@
 
 ```
                     ┌─────────────────────────────────┐
-                    │       Orchestration Harness      │
-                    │ (OpenCode default, Claude compat)│
+                    │    Supported Agent Harnesses     │
+                    │     (Claude Code / OpenCode)     │
                     └──────────┬──────────────────────┘
                                │
             ┌──────────────────┼──────────────────────┐
@@ -63,7 +63,7 @@ batch-input.tsv    →  batch-runner.sh  →  N × provider-backed workers
                     (tracks progress)
 ```
 
-Each worker is a headless provider-backed session routed through `orchestration/run-agent.mjs`. OpenCode is the default backend and Claude remains optional. Workers produce:
+Each worker is a headless provider-backed session routed through `orchestration/run-agent.mjs`. Claude Code and OpenCode are both supported. OpenCode workers can run as direct CLI invocations, multiple clients attached to a shared server, or SDK-backed workers. Workers produce:
 - Report .md
 - PDF
 - Tracker TSV line

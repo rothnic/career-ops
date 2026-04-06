@@ -1,6 +1,6 @@
-# Career-Ops -- Claude Compatibility Adapter
+# Career-Ops -- Claude Code Adapter
 
-Claude Code remains supported, but it is no longer the canonical orchestration harness.
+Claude Code is one of the supported Career-Ops harness adapters.
 
 ## Read order
 
@@ -15,7 +15,7 @@ Before executing any Career-Ops workflow in Claude Code:
 - `docs/ORCHESTRATION.md` is the provider-neutral orchestration contract
 - `modes/*.md` remain the workflow spec
 - `.claude/skills/career-ops/SKILL.md` remains the Claude router
-- OpenCode is the primary harness; Claude is optional compatibility
+- OpenCode and Claude Code are equal supported options
 
 ---
 
@@ -31,7 +31,7 @@ The portfolio that goes with this system is also open source: [cv-santiago](http
 
 ## What is career-ops
 
-AI-powered job search automation with Claude compatibility: pipeline tracking, offer evaluation, CV generation, portal scanning, batch processing.
+AI-powered job search automation for multiple coding agents: pipeline tracking, offer evaluation, CV generation, portal scanning, batch processing.
 
 ### Main Files
 

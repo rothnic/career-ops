@@ -5,6 +5,8 @@ agent: career-ops
 
 Read `docs/ORCHESTRATION.md` first.
 
+Commands route input; agents execute the resolved mode. If your OpenCode setup supports project skills, `.opencode/skills/career-ops/SKILL.md` is the equivalent skill router.
+
 Determine the mode from the command arguments using this contract:
 
 - empty → discovery

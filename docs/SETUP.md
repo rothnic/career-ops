@@ -2,10 +2,11 @@
 
 ## Prerequisites
 
-- [OpenCode](https://opencode.ai/) installed and configured
+- One supported coding agent installed and configured:
+  - [OpenCode](https://opencode.ai/)
+  - [Claude Code](https://claude.ai/code)
 - Node.js 18+ (for PDF generation and utility scripts)
 - (Optional) Go 1.21+ (for the dashboard TUI)
-- (Optional) [Claude Code](https://claude.ai/code) if you want compatibility with the previous harness
 
 ## Quick Start (5 steps)
 
@@ -45,15 +46,17 @@ Edit `portals.yml`:
 
 ### 5. Start using
 
-Open OpenCode in this directory:
+Choose either supported coding agent in this directory:
 
 ```bash
 opencode
+# or
+claude
 ```
 
 Then paste a job offer URL or description. Career-ops will automatically evaluate it, generate a report, create a tailored PDF, and track it.
 
-If you prefer the previous harness, Claude Code still works as an optional compatibility path.
+If you use OpenCode and project skills are enabled, you can use the Claude-compatible OpenCode skill router as well as the command router.
 
 ## Available Commands
 
@@ -73,6 +76,8 @@ If you prefer the previous harness, Claude Code still works as an optional compa
 node cv-sync-check.mjs      # Check configuration
 node verify-pipeline.mjs     # Check pipeline integrity
 ```
+
+For a full OpenCode walkthrough, see [OPENCODE-TEST-PLAN.md](OPENCODE-TEST-PLAN.md).
 
 ## Build Dashboard (Optional)
 

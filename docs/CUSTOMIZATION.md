@@ -51,14 +51,14 @@ The negotiation section provides frameworks for salary discussions. Replace the 
 
 ## Plugins and Hooks (Optional)
 
-Career-ops can integrate with external systems via OpenCode plugins and hook events. Project plugins live in `.opencode/plugins/`.
+Career-ops can integrate with external systems via OpenCode plugins and hook events or Claude Code hooks.
 
 Examples in this repo:
 
 - `.opencode/plugins/career-ops-policy.mjs` — guardrails and Playwright serialization
 - `.opencode/plugins/career-ops-telemetry.mjs` — tool event logging
 
-Claude Code hooks remain possible for compatibility, but OpenCode plugins are now the primary extension path.
+Use `.opencode/plugins/` for OpenCode lifecycle behavior and `.claude/settings.json` for Claude-specific hooks when needed. Keep the behavior aligned across harnesses where practical.
 
 ## States (templates/states.yml)
 

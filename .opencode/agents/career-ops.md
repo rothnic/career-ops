@@ -1,13 +1,15 @@
 ---
-description: Primary Career-Ops orchestration agent
+description: Main Career-Ops orchestration agent
 ---
 
-You are the primary Career-Ops agent.
+You are the main Career-Ops agent.
 
 Before executing any mode:
 
 1. Read `docs/ORCHESTRATION.md`
-2. Read the mode files required by the routing contract
-3. Preserve all pipeline and tracker invariants
+2. If `.opencode/skills/career-ops/SKILL.md` is available and the harness supports project skills, load it as the router
+3. Otherwise use `.opencode/commands/career-ops.md`
+4. Read the mode files required by the routing contract
+5. Preserve all pipeline and tracker invariants
 
-OpenCode is the primary harness for this repository. Claude compatibility still exists, but the shared orchestration contract lives in `docs/ORCHESTRATION.md`.
+OpenCode is one supported adapter for this repository. The shared orchestration contract lives in `docs/ORCHESTRATION.md`.

@@ -4,6 +4,7 @@ import { readFile } from "node:fs/promises";
 import { spawn, spawnSync } from "node:child_process";
 
 const EXIT_CODE_SIGNAL_TERMINATED = 128;
+const EXIT_CODE_UNKNOWN_TERMINATION = 1;
 
 function getArg(name) {
   const index = process.argv.indexOf(name);
@@ -54,7 +55,7 @@ function resolveProvider(requestedProvider) {
 
   if (opencodeAvailable && claudeAvailable) {
     throw new Error(
-      "Both OpenCode and Claude Code are available. Set CAREER_OPS_AGENT_PROVIDER=opencode or claude."
+      "Both OpenCode and Claude Code are available. No default is chosen in mixed environments; set CAREER_OPS_AGENT_PROVIDER=opencode or claude."
     );
   }
   if (opencodeAvailable) return "opencode";
@@ -91,7 +92,9 @@ function spawnAndPipe(command, args, options = {}) {
         return;
       }
 
-      resolve(1);
+      // This should be unreachable in normal child-process behavior.
+      // Treat it as a generic launcher failure instead of silently succeeding.
+      resolve(EXIT_CODE_UNKNOWN_TERMINATION);
     });
   });
 }
@@ -111,6 +114,9 @@ async function runClaude(prompt, systemPromptFile) {
 async function runOpenCodeCli(prompt, systemPrompt) {
   const bin = process.env.CAREER_OPS_OPENCODE_BIN || "opencode";
   const runArgs = shellWords(process.env.CAREER_OPS_OPENCODE_RUN_ARGS);
+  // Keep this prompt merge format aligned with docs/ORCHESTRATION.md.
+  // OpenCode CLI mode receives one combined prompt consisting of the resolved
+  // system prompt, a separator, and a labeled user request block.
   const combinedPrompt = systemPrompt
     ? `${systemPrompt}\n\n---\n\nUser request:\n${prompt}`
     : prompt;

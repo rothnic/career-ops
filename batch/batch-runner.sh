@@ -95,7 +95,7 @@ resolve_provider() {
   fi
 
   if [[ "$opencode_available" == "true" && "$claude_available" == "true" ]]; then
-    echo "ERROR: Both OpenCode and Claude Code are available. Set CAREER_OPS_AGENT_PROVIDER=opencode or claude." >&2
+    echo "ERROR: Both OpenCode and Claude Code are available. No default is chosen in mixed environments; set CAREER_OPS_AGENT_PROVIDER=opencode or claude." >&2
     exit 1
   elif [[ "$opencode_available" == "true" ]]; then
     echo "opencode"

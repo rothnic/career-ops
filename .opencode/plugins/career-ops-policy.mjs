@@ -12,7 +12,7 @@ function argsText(input, output) {
 }
 
 function containsDotEnvPath(text) {
-  return /(^|[\\/"'\s])\.env(\.[a-z0-9_-]+)?(?=$|[\\/"'\s])/i.test(text);
+  return /(^|[\\/"'\s])\.env(?:\.[a-z0-9_-]+)*(?=$|[\\/"'\s])/i.test(text);
 }
 
 function isPlaywrightInvocation(input, output) {
